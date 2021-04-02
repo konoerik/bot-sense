@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>    
+<meta charset="utf-8">
+    <title>Help</title>
+</head>
+<body>
+    <div class="navBar">
+        <nav class="navbar bg-dark navbar-expand-lg navbar-dark">
+                   
+          <a class= "nav-link" href="http://localhost:3000/#" style= font-size:14px; > Home</a>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+             </div>
+         </nav>
+        </div>
+
+
+    <h2>BotSense Help Page</h2>      
+<h3>What is BotSense? </h3>
+    <p>BotSense is a project of the Software Engineering Capstone class, Spring 
+        2021 at Kennesaw State University. BotSense is a machine learning 
+        algorithm trained to calculate a score indicate likely human 
+        accounts. High scores indicate likely bot accounts. BotSense compares 
+        an account to other various labeled examples. The application is used 
+        by various machine learning models to compute the bot scores. 
+       
+</p>
+
+
+        <h3>What is a Twitter bot? </h3> 
+        Given this wide range of behaviors, there is no universally 
+        agreed-upon definition of bot. We define a social bot as a social 
+        media account controlled at least in part through software. 
+        Deceptive bots take on inauthentic personas and are controlled 
+        by unknown entities. Social media APIs provide methods to 
+        execute actions programmatically. 
+
+        <h3>What does the score mean?</h3>
+        <p>The "score" shown next to the user name is based on a comparison
+            of many models trained on different kinds of bots and on user 
+            accounts. A higher score means more bot-like activity. Bot 
+            scores are displayed on a "0 to 5" scale. Score zero means 
+            most human-like and score 5 means the most bot-like account. 
+            A middle score is a signal that our classifier is uncertain 
+            about the classification.
+                </p>
+
+            <h3>Why do I have to login to Twitter?</h3>
+            <p>When a BotSense user check a Twitter user's bot score, 
+                this service uses Twitter's REST API in order to obtain 
+            public data about that account. And after bot-score analysis, 
+            application user will receive the result. In order to use 
+            Twitter's API, the user must have a Twitter account and be 
+            logged in. The application user also needs permission to 
+            make API request to fetch user profiles and activity from accounts.      </p>       
+
+</body>
+
+</html>

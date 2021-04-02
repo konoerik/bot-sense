@@ -1,0 +1,43 @@
+version: '3'
+services:
+    int-server:
+      container_name: bot-int-services
+      build:
+          dockerfile: ./Dockerfile
+          context: /Users/erik/Workspace/bot-workspace/bot-int-services
+      ports:
+        - "5001:5001"
+      environment:
+        - PYTHONUNBUFFERED=0
+      networks: 
+        - bot-network
+
+    bot-ml:
+      container_name: bot-ml
+      restart: always
+      build:
+        dockerfile: ./Dockerfile
+        context: /Users/erik/Workspace/bot-workspace/bot-ml
+      ports:
+        - "5002:5002"
+      environment:
+        - PYTHONUNBUFFERED=0
+      networks: 
+        - bot-network
+
+    bot-ui:
+      container_name: bot-ui
+      restart: always
+      build:
+        dockerfile: ./Dockerfile
+        context: /Users/erik/Workspace/bot-workspace/bot-ui
+      ports:
+        - "3000:3000"
+      environment:
+        - PYTHONUNBUFFERED=0
+      networks: 
+        - bot-network
+
+networks:
+  bot-network:
+    driver: bridge

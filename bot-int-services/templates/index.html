@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Check for bot user</title>
+    </head>
+    
+<!-- Adding styles like colour, height, width, border to our html page -->
+<style>
+
+
+input[type=text], select {
+  width: 80%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-weight: bolder;
+}
+
+input[type=submit] {
+  width: 80%;
+  background-color: goldenrod;
+  color:black;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size:100;
+  font-weight: bolder;
+}
+
+
+input[type=submit]:hover {
+  background-color: orangered;
+}
+form{
+    border-radius: 10px;
+    padding-top: 5%;
+    font-weight: bolder;
+}
+div {
+ 
+  border-radius: 5px;
+  margin-left: 35%;
+  width: 30%;
+  
+}
+h1{
+    color: goldenrod;
+    font-size: 40px;
+    font-weight: bolder;
+}
+h3{
+  color: rgb(68, 15, 15);
+}
+
+body {
+            
+            background-image: url("");
+            background-repeat: no-repeat;
+            background-size: cover;
+            text-align: center;
+            padding: 0px;
+        }
+       
+</style>
+
+<body>
+
+<h1>Verify if a user is a Bot</h1>
+
+<div>
+ <!-- Html form which will get all the values from user -->
+ <form action="{{ url_for('testPredict')}}" method="post" style="background-color:#E6E6FA">
+
+  <label for="screen_name">Screen Name</label><br>
+  <input type="text" id="screen_name" name="screen_name" placeholder="kernyeahx" value="kernyeahx" required="required"><br>
+  
+  <label for="followers_count">followers count</label><br>
+  <input type="text" id="followers_count" name="followers_count" placeholder="1291" value="1291" required="required"><br>
+
+  <label for="friends_count">friends count</label><br>
+  <input type="text" id="friends_count" name="friends_count" placeholder="10" value="10" required="required"><br>
+
+  <label for="verified">Verified</label><br>
+  <select id="verified" name="verified">
+    <option selected="selected" value="True">True</option>
+    <option value="False">False</option>
+  </select><br>
+
+  <label for="status_count">Statuses count</label><br>
+  <input type="text" id="statuses_count" name="statuses_count" placeholder="78554" value="78554" required="required"><br>
+  
+  <label for="listed">Listed</label><br>
+  <select id="listed" name="listed">
+    <option selected="selected" value="True">True</option>
+    <option value="False">False</option>
+  </select><br>
+
+<!-- submit button -->           
+<input type="submit" value="Find bot">
+</form>
+</div>
+    
+<!-- the predicted text -->
+<h3>{{ prediction_text }}</h3>
+
+</body>
+</html>
