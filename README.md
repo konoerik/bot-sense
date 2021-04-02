@@ -11,6 +11,7 @@ The project utilizes docker images to separate the services
 ## Local Deployment
 
 1. CD to bot-build
+2. Edit the `docker-compose.yml` file to reflect your local directories
 2. Run the below to build the docker containers
 
     `docker-compose build`
@@ -19,9 +20,8 @@ The project utilizes docker images to separate the services
 
     `docker-compose up`
 
-4. Open browser and navigato to: 
+4. Open browser and navigate to: 
 
-    `http://localhost:5001`
+    `http://localhost:5001` (ML test screen)
 
-5. Click on the test screen 'find bot' button. This will make a call to other docker container to complete the ML process.
-    This part is not complete yet, but running the above shows how we can run different services in different independant modules. 
+    `http://localhost:3000` (Web landing screen)
