@@ -1,57 +1,215 @@
-from flask import Flask, request, render_template
+#!/usr/bin/env python
+# coding: utf-8
 
-import requests
-import logging
+# # Install at CMD
 
-#create a Flask object
-app = Flask("bot_int_services")
+# pip install flask
+# pip install tweepy
+# pip install flask-restful
+# pip install python-dotenv
 
-s_handler = logging.StreamHandler()
-s_handler.setLevel(logging.INFO)
-app.logger.addHandler(s_handler)
+# # User Authentication Endpoint
 
-#define the route(basically url) to which we need to send http request
-#HTTP GET request method
-@app.route('/',methods=['GET'])
-
-#create a function Home that will return index.html(which contains html form)
-#index.html file is created seperately
-def Home():
-    return render_template('index.html')
-
-@app.route('/testPredict', methods=['GET','POST'])
-def testPredict():
-    if request.method == 'POST':
-        screen_name = request.form['screen_name']
-        followers_count = int(request.form['followers_count'])
-        friends_count = int(request.form['friends_count'])
-        verified = request.form['verified']
-        statuses_count = int(request.form['statuses_count'])
-        listed = request.form['listed']
-        verified = False
-        listed_count_binary = False
-        # print("screenName:" + screen_name)
-        # print("followers_count:" + str(followers_count))
-
-        post_data = {'screen_name': request.form['screen_name'], 'followers_count':int(request.form['followers_count']), 'friends_count':int(request.form['friends_count']),
-                    'verified':  request.form['verified'], 'listed_count_binary':'False', 'statuses_count': int(request.form['statuses_count']), 'listed':request.form['listed']}
-
-        print(post_data)
-        response = requests.post("http://bot-ml:5002/predict", post_data)
-        print(response.content, flush=True)
-
-        return render_template('index.html',prediction_text=response.content)
-    else:
-         return render_template('index.html')
+# In[1]:
 
 
+from flask import Flask, render_template, request, redirect, session, jsonify
+from flask_restful import Api, Resource
+from dotenv import load_dotenv
+from os import environ
+import json
+import tweepy
+import webbrowser
+load_dotenv()
 
-def callMLService():
-    response = requests.get("http://localhost:5000/helloWorld")
-    logging.info(response.content)
+# Flask object is generated and developer keys are assigned
+app = Flask(__name__)
+callbackurl = 'http://127.0.0.1:5000/callback'
+consumer_key = environ['consumer_key']
+consumer_secret = environ['consumer_secret']
+
+# Redirect to twitter authentication
+@app.route('/')
+def auth():
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret, callbackurl)
+    return redirect(auth.get_authorization_url())
+
+# Assigns and sets users key and secret then redirects to a url
+@app.route('/callback')
+def botsense_callback():
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret, callbackurl)
+    token = request.args.get('oauth_token')
+    verifier = request.args.get('oauth_verifier')
+    auth.request_token = {'oauth_token': token,
+                             'oauth_token_secret': verifier}
+    auth.get_access_token(verifier)
+    key = auth.access_token
+    secret = auth.access_token_secret
+    session['key'] = key
+    session['secret'] = secret
+    
+    #return render_template('home.html')
+    
+    # TESTING
+    #return redirect('/api/v1/friendsList')
+    return redirect('/api/v1/followerList')
+    #return redirect('/api/v1/unfollowUser')
+    #return redirect('/api/v1/blockUser')
+    #return redirect('/api/v1/predict')
 
 
-if __name__=="__main__":
-#     #run method starts our web service
-#     #Debug : as soon as I save anything in my structure, server should start again
-    app.run(debug=True, host='0.0.0.0', port=5001)
+# # Friends List Endpoint
+
+# In[2]:
+
+
+@app.route('/api/v1/friendsList', methods = ['GET'])
+def friendsList():   
+    key = session['key']
+    secret = session['secret']
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(key, secret)
+    api = tweepy.API(auth)
+    
+    # TEST: Using friends to create custom dictionary for 1 friend
+    friends = tweepy.Cursor(api.friends).items(1)
+    
+    # Creates a dictionary for every user and appends it to the userInfo list
+    userInfo = []
+    for user in friends:
+        userFeatures = {}
+        userFeatures["screen_name"] = user.screen_name
+        userFeatures["followers_count"] = user.followers_count
+        userFeatures["friends_count"] = user.followers_count
+        userFeatures["verified"] = user.verified
+        userFeatures["statuses_count"] = user.statuses_count
+        userFeatures["listed_count"] = user.listed_count
+        userInfo.append(userFeatures)
+    
+    return json.dumps(userInfo)
+
+
+# # Follower List Endpoint
+
+# In[3]:
+
+
+@app.route('/api/v1/followerList', methods = ['GET'])
+def followerList():   
+    key = session['key']
+    secret = session['secret']
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(key, secret)
+    api = tweepy.API(auth)
+    
+    # TEST: Using followers to create custom dictionary for 1 follower
+    followers = tweepy.Cursor(api.followers).items(1)
+    
+    # Creates a dictionary for every user and appends it to the userInfo list
+    userInfo = []
+    for user in followers:
+        userFeatures = {}
+        userFeatures["screen_name"] = user.screen_name
+        userFeatures["followers_count"] = user.followers_count
+        userFeatures["friends_count"] = user.followers_count
+        userFeatures["verified"] = user.verified
+        userFeatures["statuses_count"] = user.statuses_count
+        userFeatures["listed_count"] = user.listed_count
+        userInfo.append(userFeatures)
+    
+    return json.dumps(userInfo)
+
+
+# # Unfollow User Endpoint (Not tested)
+
+# In[4]:
+
+
+@app.route('/api/v1/unfollowUser', methods = ['POST'])
+def unfollowUser():
+    key = session['key']
+    secret = session['secret']
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(key, secret)
+    api = tweepy.API(auth)
+    
+    #For 1 user
+    screen_name = request.form['screen_name']
+    api.destroy_friendship(screen_name)
+
+
+# # Block User Endpoint (Not tested)
+
+# In[5]:
+
+
+@app.route('/api/v1/blockUser', methods = ['POST'])
+def blockUser():
+    key = session['key']
+    secret = session['secret']
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(key, secret)
+    api = tweepy.API(auth)
+
+    #For 1 user
+    screen_name = request.form['screen_name']
+    api.create_block(screen_name)
+
+
+# # Predict Endpoint (Not tested)
+
+# In[6]:
+
+
+@app.route('/api/v1/predict', methods = ['POST'])
+def predict():
+    screen_name = request.form['screen_name']
+    followers_count = int(request.form['followers_count'])
+    friends_count = int(request.form['friends_count'])
+    verified = request.form['verified']
+    statuses_count = int(request.form['statuses_count'])
+    listed = request.form['listed']
+    listed_count_binary = False
+
+    #For 1 user
+    post_data = {'screen_name': request.form['screen_name'], 'followers_count':int(request.form['followers_count']), 'friends_count':int(request.form['friends_count']),
+                'verified':  request.form['verified'], 'listed_count_binary':'False', 'statuses_count': int(request.form['statuses_count']), 'listed':request.form['listed']}
+
+    return requests.post("http://bot-ml:5002/predict", post_data)
+
+
+# In[7]:
+
+
+#@app.route('/api/v1/Userlist', methods = ['GET'])
+#def Userlist():   
+#    key = session['key']
+#    secret = session['secret']
+#    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+#    auth.set_access_token(key, secret)
+#    api = tweepy.API(auth)
+    
+    # Assigns friends and follower user objects from twitter to variables
+#    friends = tweepy.Cursor(api.friends).items(20)
+#    followers = tweepy.Cursor(api.followers).items(20)
+    
+    # Creates a list of screen_names from the follower and friend user objects
+#    friendList = [user.screen_name for user in friends]
+#    followerList = [user.screen_name for user in followers]
+    
+    # Combines lists and removes duplicates if any exist
+#    knownUsers = friendList + followerList
+#    knownUsers = list(set(knownUsers))
+    
+#    return json.dumps(knownUsers)
+
+
+# # Main
+
+# In[ ]:
+
+
+if __name__=='__main__':
+    app.secret_key = environ['sessions_key']
+    app.run(debug=False)
+
