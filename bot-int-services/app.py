@@ -1,57 +1,128 @@
-from flask import Flask, request, render_template
+from flask import Flask, render_template, request, redirect, session, jsonify
+from flask_restful import Api, Resource
+from flask_cors import CORS, cross_origin
+from flask import jsonify
+from dotenv import load_dotenv
+from os import environ
+import json
+import tweepy
+import webbrowser
+import uuid
+load_dotenv()
 
-import requests
-import logging
+# Create Flask app
+app = Flask('IntegrationServices')
+app.secret_key = str(uuid.uuid1())
+CORS(app)
 
-#create a Flask object
-app = Flask("bot_int_services")
+# From developer.twitter.com/botsense
+CONSUMER_KEY = 'L2l43uNjk2Hm6ouTq23so8IuG'
+CONSUMER_SECRET = 'krKx9txNzaBrkcGeUfSfGhiJhY5NdU3m3K8qe3sAwkRlfGhcMv'
+ACCESS_TOKEN = None
+ACCESS_TOKEN_SECRET = None
+CALLBACKURL = 'http://127.0.0.1:5000/callback'
+API = None
 
-s_handler = logging.StreamHandler()
-s_handler.setLevel(logging.INFO)
-app.logger.addHandler(s_handler)
+@app.route('/')
+def home():
+    return jsonify("This is the home page")
 
-#define the route(basically url) to which we need to send http request
-#HTTP GET request method
-@app.route('/',methods=['GET'])
+# @app.route('/auth')
+# def auth():
+#     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+#     return jsonify(auth.get_authorization_url())
 
-#create a function Home that will return index.html(which contains html form)
-#index.html file is created seperately
-def Home():
-    return render_template('index.html')
+@cross_origin()
+@app.route('/api/v1/auth', methods=['GET'])
+def auth():
+    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    return jsonify(auth.get_authorization_url())
 
-@app.route('/testPredict', methods=['GET','POST'])
-def testPredict():
-    if request.method == 'POST':
-        screen_name = request.form['screen_name']
-        followers_count = int(request.form['followers_count'])
-        friends_count = int(request.form['friends_count'])
-        verified = request.form['verified']
-        statuses_count = int(request.form['statuses_count'])
-        listed = request.form['listed']
-        verified = False
-        listed_count_binary = False
-        # print("screenName:" + screen_name)
-        # print("followers_count:" + str(followers_count))
+@app.route('/callback')
+def botsense_callback():
+    global ACCESS_TOKEN, ACCESS_TOKEN_SECRET, API
+    auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET, CALLBACKURL)
+    token = request.args.get('oauth_token')
+    verifier = request.args.get('oauth_verifier')
+    auth.request_token = {'oauth_token': token,
+                             'oauth_token_secret': verifier}
+    auth.get_access_token(verifier)
+    key = auth.access_token
+    secret = auth.access_token_secret
+    session['key'] = key
+    session['secret'] = secret
+    ACCESS_TOKEN = key
+    ACCESS_TOKEN_SECRET = secret
+    API = tweepy.API(auth)
+    
+    return "All done! This would not even be visible in production environment!"
 
-        post_data = {'screen_name': request.form['screen_name'], 'followers_count':int(request.form['followers_count']), 'friends_count':int(request.form['friends_count']),
-                    'verified':  request.form['verified'], 'listed_count_binary':'False', 'statuses_count': int(request.form['statuses_count']), 'listed':request.form['listed']}
+@cross_origin()
+@app.route('/api/v1/friendsList', methods = ['GET'])
+def friendsList():
+    # TEST: Using friends to create custom dictionary for 1 friend
+    friends = tweepy.Cursor(API.friends).items(1)
+    
+    # Creates a dictionary for every user and appends it to the userInfo list
+    userInfo = []
+    for user in friends:
+        userFeatures = {}
+        userFeatures["screen_name"] = user.screen_name
+        userFeatures["followers_count"] = user.followers_count
+        userFeatures["friends_count"] = user.followers_count
+        userFeatures["verified"] = user.verified
+        userFeatures["statuses_count"] = user.statuses_count
+        userFeatures["listed_count"] = user.listed_count
+        userInfo.append(userFeatures)
+    
+    return jsonify(userInfo)
 
-        print(post_data)
-        response = requests.post("http://bot-ml:5002/predict", post_data)
-        print(response.content, flush=True)
+@app.route('/api/v1/followerList', methods = ['GET'])
+def followerList():   
+    # TEST: Using followers to create custom dictionary for 1 follower
+    followers = tweepy.Cursor(API.followers).items(1)
+    
+    # Creates a dictionary for every user and appends it to the userInfo list
+    userInfo = []
+    for user in followers:
+        userFeatures = {}
+        userFeatures["screen_name"] = user.screen_name
+        userFeatures["followers_count"] = user.followers_count
+        userFeatures["friends_count"] = user.followers_count
+        userFeatures["verified"] = user.verified
+        userFeatures["statuses_count"] = user.statuses_count
+        userFeatures["listed_count"] = user.listed_count
+        userInfo.append(userFeatures)
+    
+    return jsonify(userInfo)
 
-        return render_template('index.html',prediction_text=response.content)
-    else:
-         return render_template('index.html')
+@app.route('/api/v1/unfollowUser', methods = ['POST'])
+def unfollowUser():
+    #For 1 user
+    screen_name = request.form['screen_name']
+    API.destroy_friendship(screen_name)
 
+@app.route('/api/v1/blockUser', methods = ['POST'])
+def blockUser():
+    #For 1 user
+    screen_name = request.form['screen_name']
+    API.create_block(screen_name)
 
+@app.route('/api/v1/predict', methods = ['POST'])
+def predict():
+    screen_name = request.form['screen_name']
+    followers_count = int(request.form['followers_count'])
+    friends_count = int(request.form['friends_count'])
+    verified = request.form['verified']
+    statuses_count = int(request.form['statuses_count'])
+    listed = request.form['listed']
+    listed_count_binary = False
 
-def callMLService():
-    response = requests.get("http://localhost:5000/helloWorld")
-    logging.info(response.content)
+    #For 1 user
+    post_data = {'screen_name': request.form['screen_name'], 'followers_count':int(request.form['followers_count']), 'friends_count':int(request.form['friends_count']),
+                'verified':  request.form['verified'], 'listed_count_binary':'False', 'statuses_count': int(request.form['statuses_count']), 'listed':request.form['listed']}
 
+    return requests.post("http://bot-ml:5002/predict", post_data)
 
-if __name__=="__main__":
-#     #run method starts our web service
-#     #Debug : as soon as I save anything in my structure, server should start again
-    app.run(debug=True, host='0.0.0.0', port=5001)
+if __name__ == '__main__':
+    app.run(debug=True)
