@@ -6,7 +6,7 @@ function App() {
         e.preventDefault();
         console.log("Click");
 
-        fetch("http://localhost:5000/api/v1/auth")
+        fetch("http://localhost:5001/api/v1/auth")
             .then(response => response.json())
             // .then(res => console.log(res));
             .then(res => localStorage.setItem('authURL', res));
@@ -30,7 +30,7 @@ function App() {
             body: JSON.stringify({ 'x': 1, 'y': 2, 'oauth_verifier': verifier })
         };
 
-        fetch("http://localhost:5000/api/v1/authver", requestOptions)
+        fetch("http://localhost:5001/api/v1/authver", requestOptions)
             .then(response => response.json())
             .then(res => console.log(res));
     }
@@ -38,7 +38,7 @@ function App() {
     function getFriendsList(e) {
         e.preventDefault();
 
-        fetch("http://localhost:5000/api/v1/friendsList")
+        fetch("http://localhost:5001/api/v1/friendsList")
             .then(response => response.json())
             .then(res => console.log(res));
     }
