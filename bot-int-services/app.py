@@ -1,14 +1,7 @@
-from flask import Flask, render_template, request, redirect, session, jsonify
-from flask_restful import Api, Resource
+from flask import Flask, request, redirect, session, jsonify
 from flask_cors import CORS, cross_origin
-from flask import jsonify
-from dotenv import load_dotenv
-from os import environ
-import json
 import tweepy
-import webbrowser
 import uuid
-load_dotenv()
 
 # Create Flask app
 app = Flask('IntegrationServices')
@@ -20,7 +13,7 @@ CONSUMER_KEY = 'L2l43uNjk2Hm6ouTq23so8IuG'
 CONSUMER_SECRET = 'krKx9txNzaBrkcGeUfSfGhiJhY5NdU3m3K8qe3sAwkRlfGhcMv'
 ACCESS_TOKEN = None
 ACCESS_TOKEN_SECRET = None
-CALLBACKURL = 'http://127.0.0.1:5000/callback'
+CALLBACKURL = 'http://127.0.0.1:5001/callback'
 API = None
 
 @app.route('/')
@@ -125,4 +118,4 @@ def predict():
     return requests.post("http://bot-ml:5002/predict", post_data)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5001)
