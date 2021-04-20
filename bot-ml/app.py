@@ -1,15 +1,19 @@
 #import required packages
 from flask import Flask, render_template, request
-import jsonify
+from flask_cors import CORS, cross_origin
+from flask import jsonify
 import requests
 import pickle
 import numpy as np
 import sklearn
 from sklearn.preprocessing import StandardScaler
 import logging
+import uuid
 
 #create a Flask object
 app = Flask("bot_model")
+app.secret_key = str(uuid.uuid1())
+CORS(app)
 
 #load the ml model which we have saved earlier in .pkl format
 model = pickle.load(open('decision-tree-bot-model.pkl', 'rb'))
@@ -25,16 +29,8 @@ def helloWorld():
 
 #define the predict function which is going to predict the results from ml model based on the given values through html form
 def predict():
-    #Fuel_type_Petrol is used in the html form and therefore we are initiating Fuel_Type_Diesel as zero 
-    Fuel_Type_Diesel=0
-    if request.method == 'POST':
-        #Use request.form to get the data from html form through post method.
-        #these all are nothing but features of our dataset(ml model)
-        # print(request.values)
-        # print(json_data, flush=True)
-        # print("TRYING VALUES NOW", flush=True)
-        # print(request.values.get('screen_name'), flush=True)
-        
+    
+    if request.method == 'POST':   
         screen_name = request.values.get('screen_name')
         followers_count = request.values.get('followers_count')
         friends_count = request.values.get('friends_count')
@@ -60,7 +56,7 @@ def predict():
         status_binary = True
     
         prediction=model.predict([[screen_name_binary, name_binary, description_binary, status_binary, verified, followers_count, friends_count, statuses_count, listed_count_binary]])
-        app.logger.info(prediction)
+        #app.logger.info(prediction)
         output=round(prediction[0],2)
         
         #condition for invalid values
