@@ -4,7 +4,9 @@ from flask_cors import CORS, cross_origin
 from flask import jsonify
 from dotenv import load_dotenv
 from os import environ
+import time
 import json
+import requests
 import tweepy
 import webbrowser
 import uuid
@@ -22,17 +24,12 @@ ACCESS_TOKEN = None
 ACCESS_TOKEN_SECRET = None
 CALLBACKURL = 'http://127.0.0.1:5000/callback'
 API = None
+PROFILE_INFO = None
 
 @app.route('/')
 def home():
     return jsonify("This is the home page")
 
-# @app.route('/auth')
-# def auth():
-#     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-#     return jsonify(auth.get_authorization_url())
-
-@cross_origin()
 @app.route('/api/v1/auth', methods=['GET'])
 def auth():
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -40,7 +37,7 @@ def auth():
 
 @app.route('/callback')
 def botsense_callback():
-    global ACCESS_TOKEN, ACCESS_TOKEN_SECRET, API
+    global ACCESS_TOKEN, ACCESS_TOKEN_SECRET, API, PROFILE_INFO
     auth = tweepy.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET, CALLBACKURL)
     token = request.args.get('oauth_token')
     verifier = request.args.get('oauth_verifier')
@@ -53,20 +50,48 @@ def botsense_callback():
     session['secret'] = secret
     ACCESS_TOKEN = key
     ACCESS_TOKEN_SECRET = secret
-    API = tweepy.API(auth)
+    API = tweepy.API(auth) 
     
     return "All done! This would not even be visible in production environment!"
 
-@cross_origin()
+@app.route('/api/v1/apiReady', methods=['GET'])
+def api_ready():  
+    while API == None:
+        time.sleep(0.5)
+    return jsonify("Ready")
+
+@app.route('/api/v1/profile', methods=['GET'])
+def profile():  
+    PROFILE_INFO = API.me()._json
+    return jsonify(PROFILE_INFO)
+
+@app.route('/api/v1/getUser', methods=['POST'])
+def getUser():  
+    user = API.destroy_friendship(request.json['screen_name'])
+    userInfo = []   # Keeping it as a list, in line with other previous APIs
+    userFeatures = {}
+    userFeatures["name"] = user.name
+    userFeatures["profile_image_url_https"] = user.profile_image_url_https
+    userFeatures["screen_name"] = user.screen_name
+    userFeatures["followers_count"] = user.followers_count
+    userFeatures["friends_count"] = user.followers_count
+    userFeatures["verified"] = user.verified
+    userFeatures["statuses_count"] = user.statuses_count
+    userFeatures["listed_count"] = user.listed_count
+    userInfo.append(userFeatures)
+    return jsonify(userInfo)
+
 @app.route('/api/v1/friendsList', methods = ['GET'])
 def friendsList():
     # TEST: Using friends to create custom dictionary for 1 friend
-    friends = tweepy.Cursor(API.friends).items(1)
+    friends = tweepy.Cursor(API.friends).items(2)
     
     # Creates a dictionary for every user and appends it to the userInfo list
     userInfo = []
     for user in friends:
         userFeatures = {}
+        userFeatures["name"] = user.name
+        userFeatures["profile_image_url_https"] = user.profile_image_url_https
         userFeatures["screen_name"] = user.screen_name
         userFeatures["followers_count"] = user.followers_count
         userFeatures["friends_count"] = user.followers_count
@@ -77,15 +102,17 @@ def friendsList():
     
     return jsonify(userInfo)
 
-@app.route('/api/v1/followerList', methods = ['GET'])
-def followerList():   
+@app.route('/api/v1/followersList', methods = ['GET'])
+def followersList():   
     # TEST: Using followers to create custom dictionary for 1 follower
-    followers = tweepy.Cursor(API.followers).items(1)
+    followers = tweepy.Cursor(API.followers).items(2)
     
     # Creates a dictionary for every user and appends it to the userInfo list
     userInfo = []
     for user in followers:
         userFeatures = {}
+        userFeatures["name"] = user.name
+        userFeatures["profile_image_url_https"] = user.profile_image_url_https
         userFeatures["screen_name"] = user.screen_name
         userFeatures["followers_count"] = user.followers_count
         userFeatures["friends_count"] = user.followers_count
@@ -98,31 +125,27 @@ def followerList():
 
 @app.route('/api/v1/unfollowUser', methods = ['POST'])
 def unfollowUser():
-    #For 1 user
-    screen_name = request.form['screen_name']
-    API.destroy_friendship(screen_name)
+    try:
+        API.destroy_friendship(request.json['screen_name'])
+        return jsonify("Successfully unfollowed!")
+    except tweepy.error.TweepError as e:
+        return jsonify("Error Occured: {}".format(e.args))
+    
 
 @app.route('/api/v1/blockUser', methods = ['POST'])
 def blockUser():
-    #For 1 user
-    screen_name = request.form['screen_name']
-    API.create_block(screen_name)
+    try:
+        API.create_block(request.json['screen_name'])
+        return jsonify("Successfully blocked!")
+    except tweepy.error.TweepError as e:
+        return jsonify("Error Occured: {}".format(e.args))
+
 
 @app.route('/api/v1/predict', methods = ['POST'])
 def predict():
-    screen_name = request.form['screen_name']
-    followers_count = int(request.form['followers_count'])
-    friends_count = int(request.form['friends_count'])
-    verified = request.form['verified']
-    statuses_count = int(request.form['statuses_count'])
-    listed = request.form['listed']
-    listed_count_binary = False
-
-    #For 1 user
-    post_data = {'screen_name': request.form['screen_name'], 'followers_count':int(request.form['followers_count']), 'friends_count':int(request.form['friends_count']),
-                'verified':  request.form['verified'], 'listed_count_binary':'False', 'statuses_count': int(request.form['statuses_count']), 'listed':request.form['listed']}
-
-    return requests.post("http://bot-ml:5002/predict", post_data)
+    user_info = request.json
+    rsp = requests.post("http://localhost:5002/predict", data=user_info)
+    return jsonify(rsp._content.decode('ascii'))
 
 if __name__ == '__main__':
     app.run(debug=True)
