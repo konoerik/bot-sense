@@ -1,68 +1,66 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 function Form(props) {
 
-    const [users, setUsers] = useState([{'screen_name': 'default'}]);
-    // const [users, setUsers] = useState([]);
+    const [name, setName] = useState('')
 
-    function isUserBot(user) {
-        console.log("Checking following user for bot status...");
-        console.log(user);
+    function handleChange(e) {
+        setName(e.target.value);
+    }
+
+    async function getUser() {
 
         const requestOptions = {
             method: 'POST',
             headers: {'Content-Type': 'application/json' },
-            body: JSON.stringify({ screen_name: user.screen_name, 
-                                   followers_count: user.followers_count, 
-                                   verified: user.verified,
-                                   friends_count: user.friends_count,
-                                   listed_count: user.listed_count,
-                                   statuses_count: user.statuses_count 
-                                })
+            body: JSON.stringify({ screen_name: name })
         };
 
-        fetch("http://localhost:5000/api/v1/predict", requestOptions)
-            .then(response => response.json())
-            .then(res => console.log(res));
-    }
-
-
-    function getFriends(e) {
-        setUsers([]);
+        const 
+            response = await fetch("http://localhost:5000/api/v1/getUser", requestOptions),
+            user = await response.json();
         
-        fetch("http://localhost:5000/api/v1/friendsList")
-            .then(response => response.json())
-            .then(res => setUsers(res))
-            .then(isUserBot(users[0]))
-            .then(props.addFriend(users[0].screen_name));
-            // .then(friends => props.showFriends(friends));
+        props.updateUsers(user);
+    };
 
-        // console.log("I will try to update this...")
-        // console.log(users);
-        // props.addFriend(users[0].screen_name);
+    async function getFriends() {
+        const 
+            response = await fetch("http://localhost:5000/api/v1/friendsList"),
+            friends = await response.json();
+        
+        props.updateUsers(friends);
+    };
 
-        // For each friend in the list, check if is a bot
-        // then call addFriend with info and status
-    }
+    async function getFollowers() {
+        const 
+            response = await fetch("http://localhost:5000/api/v1/followersList"),
+            followers = await response.json();
 
-    function getFollowers(e) {
-        fetch("http://localhost:5000/api/v1/followersList")
-            .then(response => response.json())
-            .then(res => setUsers(res));
-            // .then(followers => props.showFriends(followers));
+        props.updateUsers(followers);
+    };
 
-        console.log("I will try to update this...")
-        console.log(users);
-        props.addFriend(users[0].screen_name);
-    }
 
-    
+
+    // The reason why only last friend/follower makes it to the App.js list is due to rendering only happening once
+    // TODO: Add check user button based on input, needs new API on INT to get by screen_name
 
     return (
-        <form>
+        <form onSubmit={getUser}>
             <div>
-                <input  type="text" className="nameInput" id="name" placeholder="Input username..."></input>
-                <button className="chUser" type="button" href="https://twitter.com/">Check User </button> 
+                <input  
+                    type="text" 
+                    className="nameInput" 
+                    id="name" 
+                    value={name}
+                    onChange={handleChange}
+                /> 
+                <button 
+                    className="chUser" 
+                    type="button" 
+                    onClick={getUser}
+                >
+                    Check User 
+                </button> 
             </div>
             <div>
             <button 

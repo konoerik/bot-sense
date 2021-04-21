@@ -7,58 +7,44 @@ import { nanoid } from "nanoid"
 
 function App(props) {
 
-    const [friends, setFriends] = useState([]);
-    // console.log(friends);
+    const [users, setUsers] = useState([]);
+    console.log(users);
 
     // const friendsList = prop.friends.map(friend => (
     //   <User id={friend.id} name={friend.name} />
     // ));
 
-    const friendsList = friends.map(friend => (
+    // const usersList = users.map(user => (
+    //     <User 
+    //         key={user.id}
+    //         id={user.id} 
+    //         name={user.screen_name}
+    //     />
+    //   ));
+
+    const usersList = users.map(user => (
         <User 
-            id={friend.id} 
-            name={friend.name}
+            user={user}
         />
       ));
 
-    function addFriend(friend) {
-        const newFriend = { id: "friend-" + nanoid(), name: friend };
-        setFriends([...friends, newFriend]);
-        console.log("Modified friendsList...");
-        console.log(friendsList);
-    };
-
-    // function refreshFriendsView(friends) {
-    //     console.log("Friends argument...");
-    //     console.log(friends);
-
-    //     friends.map(friend => (
-    //         setFriendsList[...friendsList,
-    //             <User 
-    //                 id= {"friend-" + nanoid()}  
-    //                 name={friend.screen_name}
-    //             />]
-    //     ));
-
-    //     console.log("Friends list...");
-    //     console.log(friendsList);
+    // function addFriend(friend) {
+    //     const newFriend = { id: "friend-" + nanoid(), name: friend };
+    //     setFriends([...friends, newFriend]);
     // };
-    // function showFriends(friends) {
-    //     // console.log(friends);
-    //     addFriend(friends[0].screen_name);
-    // }
 
-    // function showFollowers(followers) {
-    //     showFriends(followers)
-    // }
+
+    function updateUsers(newUsers) {
+        setUsers(newUsers);
+    };
 
     return (
     <div className="botsense-main">
         <Navbar />
         <Greeting />
-        <Form addFriend={addFriend}/>
+        <Form updateUsers={updateUsers}/>
         <ul>
-            {friendsList}
+            {usersList}
         </ul>
     </div>
   );
