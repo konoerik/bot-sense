@@ -65,15 +65,33 @@ def profile():
     PROFILE_INFO = API.me()._json
     return jsonify(PROFILE_INFO)
 
+@app.route('/api/v1/getUser', methods=['POST'])
+def getUser():  
+    user = API.destroy_friendship(request.json['screen_name'])
+    userInfo = []   # Keeping it as a list, in line with other previous APIs
+    userFeatures = {}
+    userFeatures["name"] = user.name
+    userFeatures["profile_image_url_https"] = user.profile_image_url_https
+    userFeatures["screen_name"] = user.screen_name
+    userFeatures["followers_count"] = user.followers_count
+    userFeatures["friends_count"] = user.followers_count
+    userFeatures["verified"] = user.verified
+    userFeatures["statuses_count"] = user.statuses_count
+    userFeatures["listed_count"] = user.listed_count
+    userInfo.append(userFeatures)
+    return jsonify(userInfo)
+
 @app.route('/api/v1/friendsList', methods = ['GET'])
 def friendsList():
     # TEST: Using friends to create custom dictionary for 1 friend
-    friends = tweepy.Cursor(API.friends).items(5)
+    friends = tweepy.Cursor(API.friends).items(2)
     
     # Creates a dictionary for every user and appends it to the userInfo list
     userInfo = []
     for user in friends:
         userFeatures = {}
+        userFeatures["name"] = user.name
+        userFeatures["profile_image_url_https"] = user.profile_image_url_https
         userFeatures["screen_name"] = user.screen_name
         userFeatures["followers_count"] = user.followers_count
         userFeatures["friends_count"] = user.followers_count
@@ -87,12 +105,14 @@ def friendsList():
 @app.route('/api/v1/followersList', methods = ['GET'])
 def followersList():   
     # TEST: Using followers to create custom dictionary for 1 follower
-    followers = tweepy.Cursor(API.followers).items(5)
+    followers = tweepy.Cursor(API.followers).items(2)
     
     # Creates a dictionary for every user and appends it to the userInfo list
     userInfo = []
     for user in followers:
         userFeatures = {}
+        userFeatures["name"] = user.name
+        userFeatures["profile_image_url_https"] = user.profile_image_url_https
         userFeatures["screen_name"] = user.screen_name
         userFeatures["followers_count"] = user.followers_count
         userFeatures["friends_count"] = user.followers_count
