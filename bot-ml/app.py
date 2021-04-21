@@ -41,8 +41,8 @@ def predict():
 
 
         statuses_count = request.values.get('statuses_count')
-        print("statuses_count:")
-        print(statuses_count)
+        # print("statuses_count:")
+        # print(statuses_count)
 
         if verified == "True":
              verified = True
