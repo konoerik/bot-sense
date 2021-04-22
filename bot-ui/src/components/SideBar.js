@@ -1,8 +1,14 @@
 import React, { useState } from "react";
+import Nav from "react-bootstrap/Nav";
+import Button from "react-bootstrap/Button";
+import Image from "react-bootstrap/Image";
 
-function Navbar() {
+function SideBar() {
 
-    const [loggedUser, setLoggedUser] = useState({profile_image_url_https: 'https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png'}); 
+    const [loggedUser, setLoggedUser] = useState({
+        profile_image_url_https: 'https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png',
+        screen_name: ''
+    }); 
 
     async function authorizeAPI() {
         const 
@@ -42,22 +48,23 @@ function Navbar() {
     };
 
     return (
-        <div className="navBar" >
-            <nav class="navbar bg-dark navbar-expand-lg navbar-dark" >
-                <a className= "nav-link" href="http://localhost:3000"> Home  </a>
-                <a className="nav-link"  href="help.html">   Help  </a>
-                <button 
-                    className="nav-link" 
-                    type="button" 
-                    onClick={setupAPI}
-                    >
-                        Login
-                </button>
-                <img src={loggedUser.profile_image_url_https} alt="img" height="48" width="48"></img>
-                <div className="collapse navbar-collapse" id="navbarSupportedContent"></div>
-            </nav>
-        </div>
+        <Nav defaultActiveKey="/home" variant="tabs" className="flex-column">
+            <Nav.Item>
+                <Nav.Link href="/home">Home</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+                <Nav.Link href="/help">Help</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+                <Nav.Link onClick={setupAPI}>Login</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+                <Nav.Link href={"https://twitter.com/" + loggedUser.screen_name}>
+                    <Image src={loggedUser.profile_image_url_https} rounded height="48" width="48" />
+                </Nav.Link>
+            </Nav.Item>
+        </Nav>
     );
   }
 
-  export default Navbar;
+  export default SideBar;

@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import Card from "react-bootstrap/Card";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Button from "react-bootstrap/esm/Button";
 
 function User(props) {
 
-    const [bot, setBot] = useState('');
+    const [bot, setBot] = useState(':False');
     const [blocked, setBlocked] = useState(false);
     const [unfollowed, setUnfollowed] = useState(false);
 
@@ -75,20 +79,48 @@ function User(props) {
 
     // Add more fields under label, or restructure the whole
     return (
-        <li className="user stack-small">            
-            { (blocked || unfollowed) ? strikedUserTemplate : defaultUserTemplate}
-            <button type="button" className="chFriends" onClick={unfollowUser} disabled={unfollowed}>
-                Unfollow
-            </button>
-            <button type="button" className="chFriends" onClick={blockUser} disabled={blocked}>
-                Block
-            </button>
-            <br></br>
-            <a href={"https://twitter.com/" + props.user.screen_name}> {props.user.name} </a>
-            {bot}
-            <br></br>
-            <img src={props.user.profile_image_url_https} alt="img" height="48" width="48"></img>
-        </li>
+        // <li className="user stack-small">            
+        //     { (blocked || unfollowed) ? strikedUserTemplate : defaultUserTemplate}
+        //     <button type="button" className="chFriends" onClick={unfollowUser} disabled={unfollowed}>
+        //         Unfollow
+        //     </button>
+        //     <button type="button" className="chFriends" onClick={blockUser} disabled={blocked}>
+        //         Block
+        //     </button>
+        //     <br></br>
+        //     <a > {props.user.name} </a>
+        //     {bot}
+        //     <br></br>
+        //     <img src={props.user.profile_image_url_https} alt="img" height="48" width="48"></img>
+        // </li>
+        <Card>
+            <Card.Header>
+                <Card.Link href={"https://twitter.com/" + props.user.screen_name}>@{props.user.screen_name}</Card.Link> | {props.user.name}</Card.Header>
+            <Card.Body>
+                <Row>
+                    <Col md="auto">
+                        <Card.Img src={props.user.profile_image_url_https} alt="img" width="48" height="48"></Card.Img>
+                    </Col>
+                    <Col>
+                        <Card.Text>{bot}</Card.Text>
+                    </Col>
+                    <Button 
+                        variant={bot.split(":")[1].trim() === "True" ?  "warning" : "outline-primary"} 
+                        onClick={unfollowUser} 
+                        disabled={unfollowed}
+                    >
+                        Unfollow?
+                    </Button>
+                    <Button 
+                        variant={bot.split(":")[1].trim() === "True" ?  "danger" : "outline-primary"}
+                        onClick={blockUser} 
+                        disabled={blocked}
+                    >
+                        Block?
+                    </Button>
+                </Row>
+            </Card.Body>
+        </Card>
     );
   }
 
