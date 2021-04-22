@@ -84,7 +84,7 @@ def getUser():
 @app.route('/api/v1/friendsList', methods = ['GET'])
 def friendsList():
     # TEST: Using friends to create custom dictionary for 1 friend
-    friends = tweepy.Cursor(API.friends).items(2)
+    friends = tweepy.Cursor(API.friends).items(10)
     
     # Creates a dictionary for every user and appends it to the userInfo list
     userInfo = []
@@ -105,7 +105,7 @@ def friendsList():
 @app.route('/api/v1/followersList', methods = ['GET'])
 def followersList():   
     # TEST: Using followers to create custom dictionary for 1 follower
-    followers = tweepy.Cursor(API.followers).items(2)
+    followers = tweepy.Cursor(API.followers).items(10)
     
     # Creates a dictionary for every user and appends it to the userInfo list
     userInfo = []
