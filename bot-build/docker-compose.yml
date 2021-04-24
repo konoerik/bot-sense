@@ -1,12 +1,12 @@
 version: '3'
 services:
-    int-server:
+    bot-int-services:
       container_name: bot-int-services
       build:
-          dockerfile: ./Dockerfile
-          context: /Users/erik/Workspace/bot-workspace/bot-int-services
+        dockerfile: ./Dockerfile
+        context: /Users/nxm5777/KSU/capstone-twitter/existing-projects/bot-sense-cont/bot-int-services
       ports:
-        - "5001:5001"
+        - "5000:5000"
       environment:
         - PYTHONUNBUFFERED=0
       networks: 
@@ -17,7 +17,7 @@ services:
       restart: always
       build:
         dockerfile: ./Dockerfile
-        context: /Users/erik/Workspace/bot-workspace/bot-ml
+        context: /Users/nxm5777/KSU/capstone-twitter/existing-projects/bot-sense-cont/bot-ml
       ports:
         - "5002:5002"
       environment:
@@ -30,11 +30,9 @@ services:
       restart: always
       build:
         dockerfile: ./Dockerfile
-        context: /Users/erik/Workspace/bot-workspace/bot-ui
+        context: /Users/nxm5777/KSU/capstone-twitter/existing-projects/bot-sense-cont/bot-ui
       ports:
         - "3000:3000"
-      environment:
-        - PYTHONUNBUFFERED=0
       networks: 
         - bot-network
 

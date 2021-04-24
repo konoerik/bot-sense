@@ -144,8 +144,8 @@ def blockUser():
 @app.route('/api/v1/predict', methods = ['POST'])
 def predict():
     user_info = request.json
-    rsp = requests.post("http://localhost:5002/predict", data=user_info)
+    rsp = requests.post("http://bot-ml:5002/predict", data=user_info)
     return jsonify(rsp._content.decode('ascii'))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host='0.0.0.0', port=5000)
