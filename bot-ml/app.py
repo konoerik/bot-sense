@@ -85,7 +85,34 @@ def create_bot_app():
         filename = "Correlationdata.png"
         return send_file(filename, mimetype='image/gif')
 
+    @app.route("/getCorrelationData", methods=['GET'])
+    def getCorrelationData():
+        filename = "./images/Correlationdata.png"
+        return send_file(filename, mimetype='image/gif')
+    
+    @app.route("/getDecisionTree", methods=['GET'])
+    def getDecisionTree():
+        filename = "./images/DecisionTree.png"
+        return send_file(filename, mimetype='image/gif')
+
+    @app.route("/getBotNonBotPlot", methods=['GET'])
+    def getBotNonBotPlot():
+        filename = "./images/plot.png"
+        return send_file(filename, mimetype='image/gif')
+
+    @app.route("/getROCCurve", methods=['GET'])
+    def getROCCurve():
+        filename = "./images/ROCCurve.png"
+        return send_file(filename, mimetype='image/gif')
+
+    @app.route("/getTop5Features", methods=['GET'])
+    def getTop5Features():
+        filename = "./images/top5features.png"
+        return send_file(filename, mimetype='image/gif')
+
     return app
+
+    
 
 
 if __name__=="__main__":
