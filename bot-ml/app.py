@@ -86,6 +86,12 @@ def create_bot_app():
         return send_file(filename, mimetype='image/gif')
 
 
+# The dense or sparsenes of this regular expression plot displays that fact that bot have less friends and ends up following others.
+    @app.route("/getBotNonBotPlot", methods=['GET'])
+    def getBotNonBotPlot():
+        filename = "./images/plot.png"
+        return send_file(filename, mimetype='image/gif')
+
 # Spearman's correlation coefficient, (ρ, also signified by rs) measures the strength and direction of association between two ranked variables.
 # This image provides how each of feature is ranked/weighed against the other. 
 # verified, listed_count, friends_count, followers_count have found to have strong correlation.
@@ -94,16 +100,17 @@ def create_bot_app():
         filename = "./images/Correlationdata.png"
         return send_file(filename, mimetype='image/gif')
 
+
+# Among other features, teh top 5 featues carrying maximum weight in determining the bot'ness of a user
+    @app.route("/getTop5Features", methods=['GET'])
+    def getTop5Features():
+        filename = "./images/top5features.png"
+        return send_file(filename, mimetype='image/gif')
+
 # This tree structure defines into how many leafs and depth the classfier went along with feature weightage to arrive at classifying a bot vs non bot
     @app.route("/getDecisionTree", methods=['GET'])
     def getDecisionTree():
         filename = "./images/DecisionTree.png"
-        return send_file(filename, mimetype='image/gif')
-
-# The dense or sparsenes of this regular expression plot displays that fact that bot have less friends and ends up following others.
-    @app.route("/getBotNonBotPlot", methods=['GET'])
-    def getBotNonBotPlot():
-        filename = "./images/plot.png"
         return send_file(filename, mimetype='image/gif')
 
 # The ROC curve is plotted with TPR against the FPR where TPR is on the y-axis and FPR is on the x-axis.
@@ -114,16 +121,10 @@ def create_bot_app():
         filename = "./images/ROCCurve.png"
         return send_file(filename, mimetype='image/gif')
 
-# Among other features, teh top 5 featues carrying maximum weight in determining the bot'ness of a user
-    @app.route("/getTop5Features", methods=['GET'])
-    def getTop5Features():
-        filename = "./images/top5features.png"
-        return send_file(filename, mimetype='image/gif')
 
     return app
 
     
-
 
 if __name__=="__main__":
     app = create_bot_app()
