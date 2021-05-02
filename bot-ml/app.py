@@ -59,10 +59,11 @@ def create_bot_app():
             name_binary = False
             description_binary = False
             status_binary = True
-        
+
             prediction=model.predict([[screen_name_binary, name_binary, description_binary, status_binary, verified, followers_count, friends_count, statuses_count, listed_count_binary]])
             app.logger.info(prediction)
             output=round(prediction[0],2)
+            
             
             #condition for invalid values
             if output<0:
@@ -121,6 +122,19 @@ def create_bot_app():
         filename = "./images/ROCCurve.png"
         return send_file(filename, mimetype='image/gif')
 
+#The confusion_matrix function evaluates classification accuracy by computing the confusion matrix with each row corresponding to 
+# the true class (Wikipedia and other references may use different convention for axes).
+# By definition, entry  in a confusion matrix is the number of observations actually in group , but predicted to be in group .
+    @app.route("/getNormalizedConfusionMatrix", methods=['GET'])
+    def getNormalizedConfusionMatrix():
+        filename = "./images/ConfusionMtrx-normalized.png"
+        return send_file(filename, mimetype='image/gif')
+
+#A default or denormalized confusion matrix
+    @app.route("/getDeNormalizedConfusionMatrix", methods=['GET'])
+    def getDeNormalizedConfusionMatrix():
+        filename = "./images/ConfusionMtrx-not-normalized.png"
+        return send_file(filename, mimetype='image/gif')
 
     return app
 

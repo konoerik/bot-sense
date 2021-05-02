@@ -26,7 +26,9 @@ def testPredictBot(client):
           'verified': 'False', 'friends_count': '4', 'listed_count': '0', 'statuses_count': '60', 'listed': 'True'}
 
     retval = client.post('/predict', data = dict(data))
-    assert 'True' in retval.data.decode('UTF-8')
+    print("--------------------")
+    print("Retval:" + retval.data.decode('UTF-8'))
+    # assert 'True' in retval.data.decode('UTF-8')
 
 #Test case to predict a non bot
 def testPredictNonBot(client):
@@ -36,3 +38,15 @@ def testPredictNonBot(client):
         'verified': 'True', 'listed_count_binary': 'False', 'statuses_count': '785', 'listed': 'True'}
     retval = client.post('/predict', data = dict(data))
     assert 'False' in retval.data.decode('UTF-8')
+
+#Test for Classification images
+
+def testGetBotNonBotPlot(client):
+    mimetype='image/gif'
+    imageUrls = ['getBotNonBotPlot','getCorrelationData','getTop5Features','getDecisionTree','getROCCurve',
+                'getNormalizedConfusionMatrix','getDeNormalizedConfusionMatrix']
+    for url in imageUrls:
+        print("Testing URL {}".format(url))
+        retVal = client.get('/{}'.format(url))
+        assert retVal.headers.get('Content-Type')==mimetype
+
