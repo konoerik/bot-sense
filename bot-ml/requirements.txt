@@ -39,3 +39,4 @@ wrapt==1.12.1
 Flask-Cors==3.0.10
 Flask-RESTful==0.3.8
 pydot==1.4.2
+pydotplus==2.0.2

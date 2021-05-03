@@ -59,10 +59,11 @@ def create_bot_app():
             name_binary = False
             description_binary = False
             status_binary = True
-        
+
             prediction=model.predict([[screen_name_binary, name_binary, description_binary, status_binary, verified, followers_count, friends_count, statuses_count, listed_count_binary]])
             app.logger.info(prediction)
             output=round(prediction[0],2)
+            
             
             #condition for invalid values
             if output<0:
@@ -85,8 +86,59 @@ def create_bot_app():
         filename = "Correlationdata.png"
         return send_file(filename, mimetype='image/gif')
 
+
+# The dense or sparsenes of this regular expression plot displays that fact that bot have less friends and ends up following others.
+    @app.route("/getBotNonBotPlot", methods=['GET'])
+    def getBotNonBotPlot():
+        filename = "./images/plot.png"
+        return send_file(filename, mimetype='image/gif')
+
+# Spearman's correlation coefficient, (ρ, also signified by rs) measures the strength and direction of association between two ranked variables.
+# This image provides how each of feature is ranked/weighed against the other. 
+# verified, listed_count, friends_count, followers_count have found to have strong correlation.
+    @app.route("/getCorrelationData", methods=['GET'])
+    def getCorrelationData():
+        filename = "./images/Correlationdata.png"
+        return send_file(filename, mimetype='image/gif')
+
+
+# Among other features, teh top 5 featues carrying maximum weight in determining the bot'ness of a user
+    @app.route("/getTop5Features", methods=['GET'])
+    def getTop5Features():
+        filename = "./images/top5features.png"
+        return send_file(filename, mimetype='image/gif')
+
+# This tree structure defines into how many leafs and depth the classfier went along with feature weightage to arrive at classifying a bot vs non bot
+    @app.route("/getDecisionTree", methods=['GET'])
+    def getDecisionTree():
+        filename = "./images/DecisionTree.png"
+        return send_file(filename, mimetype='image/gif')
+
+# The ROC curve is plotted with TPR against the FPR where TPR is on the y-axis and FPR is on the x-axis.
+# It is one of the most important evaluation metrics for checking any classification model’s performance.
+#  A good ROC curve here indicates that the probability of fidning the bot is high
+    @app.route("/getROCCurve", methods=['GET'])
+    def getROCCurve():
+        filename = "./images/ROCCurve.png"
+        return send_file(filename, mimetype='image/gif')
+
+#The confusion_matrix function evaluates classification accuracy by computing the confusion matrix with each row corresponding to 
+# the true class (Wikipedia and other references may use different convention for axes).
+# By definition, entry  in a confusion matrix is the number of observations actually in group , but predicted to be in group .
+    @app.route("/getNormalizedConfusionMatrix", methods=['GET'])
+    def getNormalizedConfusionMatrix():
+        filename = "./images/ConfusionMtrx-normalized.png"
+        return send_file(filename, mimetype='image/gif')
+
+#A default or denormalized confusion matrix
+    @app.route("/getDeNormalizedConfusionMatrix", methods=['GET'])
+    def getDeNormalizedConfusionMatrix():
+        filename = "./images/ConfusionMtrx-not-normalized.png"
+        return send_file(filename, mimetype='image/gif')
+
     return app
 
+    
 
 if __name__=="__main__":
     app = create_bot_app()
