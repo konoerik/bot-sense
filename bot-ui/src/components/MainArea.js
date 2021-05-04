@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Button from "react-bootstrap/esm/Button";
 import FormControl from "react-bootstrap/FormControl";
 import InputGroup from "react-bootstrap/InputGroup";
@@ -32,6 +32,7 @@ function MainArea(props) {
             friends = await response.json();
         
         props.updateUsers(friends);
+        props.setFriendsOrFollowers("friends");
     };
 
     async function getFollowers() {
@@ -40,6 +41,7 @@ function MainArea(props) {
             followers = await response.json();
 
         props.updateUsers(followers);
+        props.setFriendsOrFollowers("followers");
     };
 
     return (
@@ -52,10 +54,9 @@ function MainArea(props) {
                 onSubmit={getUser}
             />
             <InputGroup.Append>
-                <Button variant="outline-secondary" onClick={getUser}> Inspect User</Button>
-            
-            <Button variant="outline-primary" onClick={getFriends}>Check My Friends</Button>
-            <Button variant="outline-primary" onClick={getFollowers}>Check My Followers</Button>
+                <Button variant="outline-primary" onClick={getUser}> Inspect User</Button>
+                <Button variant="outline-primary" onClick={getFriends}>Check My Friends</Button>
+                <Button variant="outline-primary" onClick={getFollowers}>Check My Followers</Button>
             </InputGroup.Append>
         </InputGroup>
     );
