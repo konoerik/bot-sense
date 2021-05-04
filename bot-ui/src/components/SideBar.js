@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import Nav from "react-bootstrap/Nav";
-import Button from "react-bootstrap/Button";
 import Image from "react-bootstrap/Image";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Model from "./pages/Model";
 
-function SideBar() {
+function SideBar(props) {
 
     const [loggedUser, setLoggedUser] = useState({
         profile_image_url_https: 'https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png',
         screen_name: ''
-    }); 
+    });
 
     async function authorizeAPI() {
         const 
@@ -16,9 +18,9 @@ function SideBar() {
             authURL = await response.json();
 
         console.log("Authorization URL: " + authURL);
-        window.open(authURL);
+        const newWindow = window.open(authURL);
 
-        return "Openned new window for authentication...";
+        return newWindow;
     };
 
     async function checkAPI() {
@@ -37,32 +39,37 @@ function SideBar() {
 
     async function setupAPI() {
         const 
-            resp = await authorizeAPI(),
+            newWindowRsp = await authorizeAPI(),
             ready = await checkAPI(),
             profile = await getUserProfile();
+            newWindowRsp.close();
         
         setLoggedUser(profile);
+        props.updateLogStatus(true);
         localStorage.setItem('user', loggedUser);
-        console.log(loggedUser);
-        console.log("END OF EXECUTION");
+        // console.log(loggedUser);
+        // console.log("END OF EXECUTION");
     };
 
-    return (
-        <Nav defaultActiveKey="/home" variant="tabs" className="flex-column">
-            <Nav.Item>
-                <Nav.Link href="/home">Home</Nav.Link>
+    return (        
+        <Nav defaultActiveKey="/" variant="tabs" className="flex-column">            
+            <Nav.Item>                
+                <About />
+            </Nav.Item>
+            <Nav.Item>                
+                <Contact />
+            </Nav.Item>
+            <Nav.Item>                
+                <Model />
             </Nav.Item>
             <Nav.Item>
-                <Nav.Link href="/help">Help</Nav.Link>
+                <Nav.Link onClick={setupAPI} disabled={loggedUser.screen_name!==''}>Login</Nav.Link>
             </Nav.Item>
-            <Nav.Item>
-                <Nav.Link onClick={setupAPI}>Login</Nav.Link>
-            </Nav.Item>
-            <Nav.Item>
-                <Nav.Link href={"https://twitter.com/" + loggedUser.screen_name}>
+             <Nav.Item>
+                <Nav.Link href={"https://twitter.com/" + loggedUser.screen_name} target="_blank">
                     <Image src={loggedUser.profile_image_url_https} rounded height="48" width="48" />
                 </Nav.Link>
-            </Nav.Item>
+            </Nav.Item>       
         </Nav>
     );
   }
