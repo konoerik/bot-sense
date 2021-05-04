@@ -1,16 +1,10 @@
-from flask import Flask, render_template, request, redirect, session, jsonify
-from flask_restful import Api, Resource
+from flask import Flask, request, redirect, session, jsonify
 from flask_cors import CORS, cross_origin
-from flask import jsonify
-from dotenv import load_dotenv
-from os import environ
-import time
-import json
-import requests
-import tweepy
-import webbrowser
 import uuid
-load_dotenv()
+import tweepy
+import requests
+import json
+import time
 
 # Create Flask app
 app = Flask('IntegrationServices')
