@@ -6,6 +6,7 @@
 2. Authorizing Access
 3. Inspecting Users
 4. User Actions
+5. Other Pages
 
 ## 1. User Interface Overview
 
@@ -31,13 +32,10 @@ To authorize access to your profile follow the steps below:
 
    ![twitter_auth](twitter_auth.png)
 
-3. Upon successful authorization, you will receive a message from the server (this is temporarily indicating succesful completion of the step). Feel free to close the new tab at this point and return to the application.
-
-   ![twitter_auth2](twitter_auth2.png)
-
-4. Going back at the application tab, note that the account profile picture is retrieved on the bottom side of the Navigation Bar. This indicates BotSense can succesfully retrieve information from your account and make all the necessary calls.
+3. Upon successful authorization, you will be redirected back to the main application. Note that the account profile picture is retrieved on the bottom side of the Navigation Bar and the Login button is disabled. Additionally there notification message has changed. This indicates BotSense can succesfully retrieve information from your account and make all the necessary calls.
 
    ![landing_page_logged_in](landing_page_logged_in.png)
+
 
 ## 3. Inspecting Users
 
@@ -59,7 +57,7 @@ These are accessible from the Actions Bar and produce the following:
 
 1. Ensure you are logged in and have authorized access to BotSense
 2. From the Actions Bar, click `Check My Friends`
-3. Notice the results in the Results Area
+3. Notice the results in the Results Area. Potential bots will be shown at the top of the list.
 
 ![check_friends](check_friends.png)
 
@@ -105,4 +103,12 @@ As seen above, for each result there are two main actions with respect to the us
 3. Optionally, you can click on the user's link (@user) and check from Twitter itself that the user is now marked as blocked. You can undo this action from the same page, to unblock the user.
 
    ![block](block.png)
+
+## 5. Other Pages
+
+For more information there are three additional pages located on the Sidebar:
+
+* About -- a short description of the project and its functionality
+* Contact -- a submission form that can be used to contact the team
+* Model -- an overview of the trained ML model used to power BotSense
 
